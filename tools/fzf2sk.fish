@@ -1,42 +1,48 @@
 #!/usr/bin/env fish
-#
-# Convert fzf.fish to skim.fish
 
-# Rename FZF_DEFAULT_OPTS to SKIM_DEFAULT_OPTIONS
-command sed -i conf.d/fzf.fish -e 's|FZF_DEFAULT_OPTS|SKIM_DEFAULT_OPTIONS|g'
+function main \
+    --description "Convert fzf.fish to skim.fish"
 
-# Replace command executions
-for path in functions/*.fish
-    command sed -i $path \
-        -e 's#| fzf#| sk#g' \
-        -e 's#fzf --#sk --#'
+    rename_FZF_DEFAULT_OPTS_to_SKIM_DEFAULT_OPTIONS
+    replace_command_executions
+    add_some_explanation_for_this_fork
 end
 
-# Add some messages to README
-set --local readme (mktemp)
-set --local preface '# skim.fish
+set -gx PROJECT_ROOT (git rev-parse --show-toplevel 2>/dev/null)
 
-This is a fork of PatrickF1\'s [fzf.fish](https://github.com/PatrickF1/fzf.fish).
-Instead of fzf, it works with [skim](https://github.com/lotabout/skim), a clone of fzf written in Rust.
-
-## Installation
-
-```fish
-fisher install mnacamura/skim.fish
-```
-
-**Original README for fzf.fish:**
-
----
-'
-set --local preface_nlines (echo $preface | command wc --lines)
-echo $preface > $readme
-if command grep -q skim README.md
-    command cat README.md \
-    | command awk "NR > "$preface_nlines" { print }" \
-    >> $readme
-else
-    command cat README.md >> $readme
+function rename_FZF_DEFAULT_OPTS_to_SKIM_DEFAULT_OPTIONS
+    for path in $PROJECT_ROOT/conf.d/fzf.fish
+        sed -i $path \
+            -e 's|FZF_DEFAULT_OPTS|SKIM_DEFAULT_OPTIONS|g'
+    end
 end
-cp -f $readme README.md
-rm -f $readme
+
+function replace_command_executions
+    for path in $PROJECT_ROOT/functions/*.fish
+        sed -i $path \
+            -e 's#| fzf#| sk#g' \
+            -e 's#fzf --#sk --#g'
+    end
+end
+
+set -l modified_readme (mktemp)
+
+function teardown --on-process-exit $fish_pid --inherit modified_readme
+    rm -f $modified_readme
+end
+
+function add_some_explanation_for_this_fork --inherit modified_readme
+    set -l readme $PROJECT_ROOT/README.md
+    set -l preface $PROJECT_ROOT/tools/preface.md
+    set -l preface_end 'Original README for fzf.fish:'
+    cat $preface >$modified_readme
+    if grep -q $preface_end $readme
+        set -l n (math 2 + (grep -En $preface_end $readme | cut -d: -f1))
+        cat $readme | awk "NR > "$n" { print }" >>$modified_readme
+    else
+        cat $readme >>$modified_readme
+    end
+    cp -f $modified_readme $readme
+end
+
+main
