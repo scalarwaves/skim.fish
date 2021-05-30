@@ -1,3 +1,18 @@
+# skim.fish
+
+This is a fork of PatrickF1's [fzf.fish](https://github.com/PatrickF1/fzf.fish).
+Instead of fzf, it works with [skim](https://github.com/lotabout/skim), a clone of fzf written in Rust.
+
+## Installation
+
+```fish
+fisher install mnacamura/skim.fish
+```
+
+**Original README for fzf.fish:**
+
+---
+
 <div align="center">
 
 # fzf.fish 🔍🐟
