@@ -8,8 +8,8 @@ function __fzf_search_history --description "Search command history. Replace the
 
     set command_with_ts (
         # Reference https://devhints.io/strftime to understand strftime format symbols
-        builtin history --null --show-time="%m-%d %H:%M:%S | " |
-        sk --read0 \
+        builtin history --null --show-time="%m-%d %H:%M:%S │ " |
+        fzf --read0 \
             --tiebreak=index \
             --query=(commandline) \
             # preview current command using fish_ident in a window at the bottom 3 lines tall
@@ -20,7 +20,7 @@ function __fzf_search_history --description "Search command history. Replace the
     )
 
     if test $status -eq 0
-        set command_selected (string split --max 1 " | " $command_with_ts)[2]
+        set command_selected (string split --max 1 " │ " $command_with_ts)[2]
         commandline --replace -- $command_selected
     end
 
