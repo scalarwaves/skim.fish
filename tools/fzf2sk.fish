@@ -11,17 +11,16 @@ end
 set -gx PROJECT_ROOT (git rev-parse --show-toplevel 2>/dev/null)
 
 function rename_FZF_DEFAULT_OPTS_to_SKIM_DEFAULT_OPTIONS
-    for path in $PROJECT_ROOT/conf.d/fzf.fish
+    for path in $PROJECT_ROOT/functions/_fzf_wrapper.fish
         sed -i $path \
             -e 's|FZF_DEFAULT_OPTS|SKIM_DEFAULT_OPTIONS|g'
     end
 end
 
 function replace_command_executions
-    for path in $PROJECT_ROOT/functions/*.fish
+    for path in $PROJECT_ROOT/functions/_fzf_wrapper.fish
         sed -i $path \
-            -e 's#| fzf#| sk#g' \
-            -e 's#fzf --#sk --#g'
+            -e 's#fzf $argv#sk $argv#g'
     end
 end
 
