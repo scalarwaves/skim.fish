@@ -1,0 +1,28 @@
+name: Merge upstream changes
+
+on:
+  schedule:
+    - cron: "42 12 * * *"
+
+jobs:
+  merge-upstream-changes:
+    runs-on: ubuntu-latest
+    name: Merge upstream changes
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: fish-actions/install-fish@v1.1.0
+      - run: |
+          git remote add upstream https://github.com/PatrickF1/fzf.fish.git
+          git fetch upstream main
+          git merge --no-ff upstream/main
+          git checkout upstream/main -- ':!tools/' ':!.github/'
+          fish tools/fzf2sk.fish
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 'maintenance: auto merge upstream changes'
+          file_pattern: ':!tools/ :!.github/'
+          push_options: '--force'
