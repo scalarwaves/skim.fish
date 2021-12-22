@@ -17,7 +17,7 @@ jobs:
       - uses: fish-actions/install-fish@v1.1.0
       - run: |
           git remote add upstream https://github.com/PatrickF1/fzf.fish.git
-          git fetch upstream main
+          git fetch --unshallow upstream main
           git merge --no-ff upstream/main
           git checkout upstream/main -- ':!tools/' ':!.github/'
           fish tools/fzf2sk.fish
