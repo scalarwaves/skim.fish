@@ -16,6 +16,8 @@ jobs:
           ref: ${{ github.head_ref }}
       - uses: fish-actions/install-fish@v1.1.0
       - run: |
+          git config user.name mnacamura
+          git config user.email mnacamura@users.noreply.github.com
           git remote add upstream https://github.com/PatrickF1/fzf.fish.git
           git fetch --unshallow upstream main
           git merge --no-ff upstream/main
