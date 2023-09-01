@@ -1,5 +1,5 @@
-function _fzf_search_directory --description "Search the current directory. Replace the current token with the selected file paths."
-    set fd_opts --color=always $fzf_fd_opts
+function _skim_search_directory --description "Search the current directory. Replace the current token with the selected file paths."
+    set fd_opts --color=always $skim_fd_opts
     if test (fd --version | string replace --regex --all '[^\d]' '') -ge 830
         # fd >= 8.3.0 prepends ./ to all paths when output is being piped
         # we don't need this so we hide it by passing --strip-cwd-prefix
@@ -7,7 +7,7 @@ function _fzf_search_directory --description "Search the current directory. Repl
         set --prepend fd_opts --strip-cwd-prefix
     end
 
-    set fzf_arguments --multi --ansi $fzf_dir_opts
+    set skim_arguments --multi --ansi $skim_dir_opts
     set token (commandline --current-token)
     # expand any variables or leading tilde (~) in the token
     set expanded_token (eval echo -- $token)
@@ -18,12 +18,12 @@ function _fzf_search_directory --description "Search the current directory. Repl
     # then use it as fd's base directory.
     if string match --quiet -- "*/" $unescaped_exp_token && test -d "$unescaped_exp_token"
         set --append fd_opts --base-directory=$unescaped_exp_token
-        # use the directory name as fzf's prompt to indicate the search is limited to that directory
-        set --prepend fzf_arguments --prompt="$unescaped_exp_token" --preview="_fzf_preview_file $expanded_token{}"
-        set file_paths_selected $unescaped_exp_token(fd $fd_opts 2>/dev/null | _fzf_wrapper $fzf_arguments)
+        # use the directory name as skim's prompt to indicate the search is limited to that directory
+        set --prepend skim_arguments --prompt="$unescaped_exp_token" --preview="_skim_preview_file $expanded_token{}"
+        set file_paths_selected $unescaped_exp_token(fd $fd_opts 2>/dev/null | _skim_wrapper $skim_arguments)
     else
-        set --prepend fzf_arguments --query="$unescaped_exp_token" --preview='_fzf_preview_file {}'
-        set file_paths_selected (fd $fd_opts 2>/dev/null | _fzf_wrapper $fzf_arguments)
+        set --prepend skim_arguments --query="$unescaped_exp_token" --preview='_skim_preview_file {}'
+        set file_paths_selected (fd $fd_opts 2>/dev/null | _skim_wrapper $skim_arguments)
     end
 
 
